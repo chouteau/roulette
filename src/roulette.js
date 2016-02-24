@@ -7,14 +7,19 @@
 
     function infiniteScroll ($window, $timeout, $document) {
         var directive = {
+            scope: {
+                roulette:'&',
+                scrollingContainer:'='
+            },
             link: link,
             restrict: 'A'
         };
         return directive;
 
 		function link(scope, element, attr) {
+		    var elem = element;
+		    var scrollIt = function () {
 
-			var scrollIt = function() {
 				$window = angular.element($window);
 				$document = angular.element($document);
 
@@ -26,11 +31,16 @@
 				lengthThreshold = parseInt(lengthThreshold, 10);
 				timeThreshold = parseInt(timeThreshold, 10);
 
+				if (scope.scrollingContainer) {
+				    elem = angular.element(document.getElementById(scope.scrollingContainer));
+				    if (!elem || !elem[0]) {
+				        elem = element;
+				    }
+				}
+				
 				var handler = function () {
 
-					var body = angular.element(document.getElementsByTagName('body')[0]);
-					var remaining = (body[0].clientHeight - body[0].scrollTop) - $window[0].outerHeight;
-					// console.log(remaining);
+				    var remaining = (elem[0].clientHeight - elem[0].scrollTop) - $window[0].outerHeight;
 					var shouldScroll = remaining < lengthThreshold && (remaining - lastRemaining) < 0;
 					//if we have reached the threshold and we scroll down
 					if (shouldScroll) {
@@ -39,24 +49,25 @@
 							$timeout.cancel(promise);
 						}
 						promise = $timeout(function () {
-							scope.$eval(attr.infiniteScroll);
+						    scope.$apply(scope.roulette);
 							promise = null;
 						}, timeThreshold);
 					}
 					lastRemaining = remaining;
 				};
 
-		        $window.on('scroll', handler);
+		        elem.off('scroll', handler);
+
+				elem.on('scroll', handler);
 				scope.$on('$destroy', function() {
-				  return $window.off('scroll', handler);
+				    return elem.off('scroll', handler);
 				});
 			}
 
-			angular.element($document).ready(function () {
-				$timeout(scrollIt, 1 * 1000);
+			scope.$watch('scrollingContainer', function (value) {
+			    scrollIt();
 			});
         }
-
     }
 
 })();
