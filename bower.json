@@ -9,7 +9,8 @@
   "main": "src/roulette.js",
   "keywords": [
     "infinitescroll",
-    "without jquery"
+    "without",
+    "jquery"
   ],
   "license": "MIT",
   "ignore": [
@@ -18,5 +19,6 @@
     "bower_components",
     "test",
     "tests"
-  ]
+  ],
+  "moduleType": []
 }
