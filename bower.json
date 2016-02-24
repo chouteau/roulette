@@ -1,0 +1,22 @@
+{
+  "name": "roulette",
+  "version": "2.1.0",
+  "homepage": "https://github.com/chouteau/roulette",
+  "authors": [
+    "paulirish"
+  ],
+  "description": "Infinite scroll directive for AngularJS without JQuery",
+  "main": "roulette.js",
+  "keywords": [
+    "infinitescroll",
+    "without jquery"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
