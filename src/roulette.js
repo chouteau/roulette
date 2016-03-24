@@ -17,7 +17,6 @@
         return directive;
 
 		function link(scope, element, attr) {
-		    var elem = element;
 		    var scrollIt = function () {
 
 				$window = angular.element($window);
@@ -31,38 +30,41 @@
 				lengthThreshold = parseInt(lengthThreshold, 10);
 				timeThreshold = parseInt(timeThreshold, 10);
 
-				if (scope.scrollingContainer) {
-				    elem = angular.element(document.getElementById(scope.scrollingContainer));
-				    if (!elem || !elem[0]) {
-				        elem = element;
-				    }
+				var container = null;
+				if (scope.scrollingContainer == 'window')
+				{
+				    container = $window;
 				}
-				
+                else if(scope.scrollingContainer){
+				    container = angular.element(document.getElementById(scope.scrollingContainer));
+				}
+				else {
+				    container =element;
+				}
+
 				var handler = function () {
 
-				    var remaining = (elem[0].clientHeight - elem[0].scrollTop) - $window[0].outerHeight;
-					var shouldScroll = remaining < lengthThreshold && (remaining - lastRemaining) < 0;
-					//if we have reached the threshold and we scroll down
-					if (shouldScroll) {
-						//if there is already a timer running which has no expired yet we have to cancel it and restart the timer
-						if (promise !== null) {
-							$timeout.cancel(promise);
-						}
-						promise = $timeout(function () {
-						    scope.$apply(scope.roulette);
-							promise = null;
-						}, timeThreshold);
-					}
-					lastRemaining = remaining;
+				    var containerBottom = (container[0].scrollHeight - container[0].scrollTop) - container[0].clientHeight;
+				    var shouldScroll = containerBottom <= lengthThreshold;
+
+				    if (shouldScroll) {
+				        if (promise !== null) {
+				            $timeout.cancel(promise);
+				        }
+				        promise = $timeout(function () {
+				            scope.$apply(scope.roulette);
+				            promise = null;
+				        }, timeThreshold);
+				    }
 				};
 
-		        elem.off('scroll', handler);
+				container.off('scroll', handler);
 
-				elem.on('scroll', handler);
-				scope.$on('$destroy', function() {
-				    return elem.off('scroll', handler);
+				container.on('scroll', handler);
+				scope.$on('$destroy', function () {
+				    return container.off('scroll', handler);
 				});
-			}
+		    }
 
 			scope.$watch('scrollingContainer', function (value) {
 			    scrollIt();
